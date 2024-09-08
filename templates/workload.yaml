@@ -1,0 +1,15 @@
+apiVersion: acme.com/v1
+kind: Workload
+metadata:
+  name: workload
+image: {{ .Values.image }}:sha-{{ .Values.revision }}
+port: 5678
+{{- if or (eq .Values.targetRevision "latest") (eq .Values.targetRevision "main") }}
+route: /backstage(/|$)(.*)
+{{- else }}
+route: /backstage-{{ .Values.targetRevision }}(/|$)(.*)
+{{- end }}
+rewrite: /$2
+replicas: 2
+env:
+ECHO_TEXT: "hello from backstage"
